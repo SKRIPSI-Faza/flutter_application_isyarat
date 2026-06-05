@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/app_colors.dart';
 import 'providers/theme_provider.dart';
 
 class GuidePage extends StatelessWidget {
@@ -8,7 +9,7 @@ class GuidePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
-    const Color primaryBlue = Color(0xFF4FC3F7);
+    const Color primaryBlue = AppColors.primary;
     final screenWidth = MediaQuery.of(context).size.width;
 
     final steps = [
@@ -47,18 +48,34 @@ class GuidePage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: Icon(Icons.arrow_back_ios,
+              color: isDark ? Colors.white70 : AppColors.primaryDark),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Panduan Deteksi'),
+        title: Text(
+          'Panduan Deteksi',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : AppColors.textDark,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppColors.bgDark1, AppColors.scaffoldDark]
+                : [AppColors.bgLight, Colors.white],
+          ),
+        ),
+        child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.symmetric(
           horizontal: screenWidth * 0.05,
@@ -104,7 +121,7 @@ class GuidePage extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [primaryBlue, Color(0xFF0288D1)],
+                              colors: [primaryBlue, AppColors.primaryDark],
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -123,7 +140,7 @@ class GuidePage extends StatelessWidget {
                           Container(
                             width: 2,
                             height: 32,
-                            color: primaryBlue.withOpacity(0.2),
+                            color: primaryBlue.withValues(alpha: 0.2),
                           ),
                       ],
                     ),
@@ -134,13 +151,13 @@ class GuidePage extends StatelessWidget {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.white.withOpacity(0.05)
+                              ? Colors.white.withValues(alpha: 0.05)
                               : Colors.grey[50],
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: isDark
-                                ? Colors.white.withOpacity(0.06)
-                                : Colors.grey.withOpacity(0.1),
+                                ? Colors.white.withValues(alpha: 0.06)
+                                : Colors.grey.withValues(alpha: 0.1),
                           ),
                         ),
                         child: Row(
@@ -191,11 +208,11 @@ class GuidePage extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.amber.withOpacity(0.06)
-                    : Colors.amber.withOpacity(0.06),
+                    ? Colors.amber.withValues(alpha: 0.06)
+                    : Colors.amber.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: Colors.amber.withOpacity(0.15),
+                  color: Colors.amber.withValues(alpha: 0.15),
                 ),
               ),
               child: Column(
@@ -246,6 +263,7 @@ class GuidePage extends StatelessWidget {
             const SizedBox(height: 24),
           ],
         ),
+      ),
       ),
     );
   }

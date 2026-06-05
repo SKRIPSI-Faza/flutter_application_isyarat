@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'core/app_colors.dart';
 import 'deteksi_page.dart';
+import 'providers/detection_provider.dart';
 import 'providers/theme_provider.dart';
 
 class CameraPreviewPage extends StatefulWidget {
@@ -10,130 +13,276 @@ class CameraPreviewPage extends StatefulWidget {
   State<CameraPreviewPage> createState() => _CameraPreviewPageState();
 }
 
-class _CameraPreviewPageState extends State<CameraPreviewPage> {
+class _CameraPreviewPageState extends State<CameraPreviewPage>
+    with SingleTickerProviderStateMixin {
   bool _isLoading = false;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDark = themeProvider.isDarkMode;
-    const Color lightBlue = Color(0xFF4FC3F7);
+    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth  = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Persiapan Deteksi'),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.06,
-            vertical: screenHeight * 0.02,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppColors.bgDark1, AppColors.scaffoldDark]
+                : [const Color(0xFFE3F2FD), Colors.white],
           ),
+        ),
+        child: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(flex: 2),
-
-              // Icon kamera
-              Container(
-                padding: EdgeInsets.all(screenWidth * 0.06),
-                decoration: BoxDecoration(
-                  color: lightBlue.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.camera_alt_rounded,
-                  size: (screenWidth * 0.14).clamp(48.0, 72.0),
-                  color: lightBlue,
-                ),
-              ),
-
-              SizedBox(height: screenHeight * 0.03),
-
-              // Judul
-              Text(
-                'Mulai Deteksi Gestur',
-                style: TextStyle(
-                  fontSize: (screenWidth * 0.055).clamp(20.0, 26.0),
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-
-              SizedBox(height: screenHeight * 0.015),
-
-              // Penjelasan singkat
+              // AppBar manual
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                child: Text(
-                  'Aplikasi akan mengakses kamera untuk mendeteksi gestur tangan secara real-time.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: (screenWidth * 0.035).clamp(13.0, 16.0),
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    height: 1.5,
-                  ),
-                ),
-              ),
-
-              const Spacer(flex: 3),
-
-              // Tombol Mulai Deteksi
-              SizedBox(
-                width: double.infinity,
-                height: (screenHeight * 0.065).clamp(50.0, 60.0),
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _startDetection,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: lightBlue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios,
+                          color: isDark
+                              ? Colors.white70
+                              : AppColors.primaryDark),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    elevation: 3,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          'Mulai Deteksi',
-                          style: TextStyle(
-                            fontSize: (screenWidth * 0.042).clamp(16.0, 20.0),
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Expanded(
+                      child: Text(
+                        'Persiapan Deteksi',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? Colors.white
+                              : AppColors.textDark,
                         ),
+                      ),
+                    ),
+                    const SizedBox(width: 48),
+                  ],
                 ),
               ),
 
-              SizedBox(height: screenHeight * 0.015),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Animated camera icon
+                      AnimatedBuilder(
+                        animation: _pulseAnimation,
+                        builder: (_, child) => Transform.scale(
+                          scale: _pulseAnimation.value,
+                          child: child,
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  colors: [
+                                    AppColors.primary.withValues(alpha: 0.15),
+                                    AppColors.primary.withValues(alpha: 0.03),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 90,
+                              height: 90,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    AppColors.primary,
+                                    AppColors.primaryDark,
+                                  ],
+                                ),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.4),
+                                    blurRadius: 20,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt_rounded,
+                                size: 40,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
-              // Teks izin kamera
-              Text(
-                'Kamera akan diaktifkan setelah Anda menekan tombol di atas',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: (screenWidth * 0.03).clamp(11.0, 13.0),
-                  color: isDark ? Colors.grey[500] : Colors.grey[500],
+                      const SizedBox(height: 24),
+
+                      Text(
+                        'Siap Mendeteksi?',
+                        style: GoogleFonts.poppins(
+                          fontSize:
+                              (screenWidth * 0.062).clamp(22.0, 28.0),
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : AppColors.textDark,
+                        ),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      Text(
+                        'Kamera akan digunakan untuk mendeteksi\ngestur bahasa isyarat secara real-time',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize:
+                              (screenWidth * 0.033).clamp(12.0, 15.0),
+                          color: isDark
+                              ? Colors.white54
+                              : Colors.grey[600],
+                          height: 1.5,
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      // Tombol mulai
+                      SizedBox(
+                        width: double.infinity,
+                        height: (screenHeight * 0.065).clamp(50.0, 62.0),
+                        child: _isLoading
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      AppColors.primary,
+                                      AppColors.primaryDark,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: const Center(
+                                  child: SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      AppColors.primary,
+                                      AppColors.primaryDark,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(18),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.primary
+                                          .withValues(alpha: 0.4),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton.icon(
+                                  onPressed: _startDetection,
+                                  icon: const Icon(
+                                      Icons.play_arrow_rounded,
+                                      size: 22),
+                                  label: Text(
+                                    'Mulai Deteksi',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: (screenWidth * 0.042)
+                                          .clamp(15.0, 18.0),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    foregroundColor: Colors.white,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(18),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Text(
+                        'Kamera akan aktif setelah tombol ditekan',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize:
+                              (screenWidth * 0.029).clamp(10.0, 12.0),
+                          color: isDark
+                              ? Colors.white30
+                              : Colors.grey[400],
+                        ),
+                      ),
+
+                    ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-
-              SizedBox(height: screenHeight * 0.04),
             ],
           ),
         ),
@@ -143,14 +292,19 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
 
   Future<void> _startDetection() async {
     setState(() => _isLoading = true);
-
-    // Simulasi loading sebentar
-    await Future.delayed(const Duration(milliseconds: 500));
-
+    await Future.delayed(const Duration(milliseconds: 400));
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const DeteksiPage()),
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => ChangeNotifierProvider(
+            create: (_) => DetectionProvider(),
+            child: const DeteksiPage(),
+          ),
+          transitionsBuilder: (_, anim, __, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
       );
     }
   }

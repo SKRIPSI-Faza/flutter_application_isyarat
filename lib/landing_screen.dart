@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/app_colors.dart';
 import 'dashboard_page.dart';
 import 'providers/theme_provider.dart';
 
@@ -99,8 +100,8 @@ class _LandingScreenState extends State<LandingScreen>
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
-    const Color lightBlue = Color(0xFF4FC3F7);
-    const Color darkBlue = Color(0xFF0288D1);
+    const Color lightBlue = AppColors.primary;
+    const Color darkBlue  = AppColors.primaryDark;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -122,16 +123,8 @@ class _LandingScreenState extends State<LandingScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: isDark
-                ? [
-                    const Color(0xFF0D1B2A),
-                    const Color(0xFF1B2838),
-                    const Color(0xFF0D1B2A),
-                  ]
-                : [
-                    Colors.white,
-                    const Color(0xFFF0F8FF),
-                    Colors.white,
-                  ],
+                ? [AppColors.bgDark1, AppColors.bgDark2, AppColors.bgDark1]
+                : [Colors.white, AppColors.bgLight, Colors.white],
           ),
         ),
         child: SafeArea(
@@ -148,7 +141,7 @@ class _LandingScreenState extends State<LandingScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        lightBlue.withOpacity(isDark ? 0.15 : 0.08),
+                        lightBlue.withValues(alpha:isDark ? 0.15 : 0.08),
                         Colors.transparent,
                       ],
                     ),
@@ -167,7 +160,7 @@ class _LandingScreenState extends State<LandingScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        darkBlue.withOpacity(isDark ? 0.12 : 0.06),
+                        darkBlue.withValues(alpha:isDark ? 0.12 : 0.06),
                         Colors.transparent,
                       ],
                     ),
@@ -210,7 +203,7 @@ class _LandingScreenState extends State<LandingScreen>
                               boxShadow: [
                                 BoxShadow(
                                   color:
-                                      lightBlue.withOpacity(isDark ? 0.4 : 0.3),
+                                      lightBlue.withValues(alpha:isDark ? 0.4 : 0.3),
                                   blurRadius: 24,
                                   spreadRadius: 2,
                                   offset: const Offset(0, 6),
@@ -223,8 +216,8 @@ class _LandingScreenState extends State<LandingScreen>
                                 height: logoInnerSize.clamp(70.0, 110.0),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? const Color(0xFF1B2838).withOpacity(0.9)
-                                      : Colors.white.withOpacity(0.92),
+                                      ? const Color(0xFF1B2838).withValues(alpha:0.9)
+                                      : Colors.white.withValues(alpha:0.92),
                                   borderRadius:
                                       BorderRadius.circular(logoSize * 0.18),
                                 ),
@@ -250,8 +243,7 @@ class _LandingScreenState extends State<LandingScreen>
                         style: TextStyle(
                           fontSize: titleSize.clamp(28.0, 40.0),
                           fontWeight: FontWeight.w800,
-                          color:
-                              isDark ? Colors.white : const Color(0xFF1A1A2E),
+                          color: isDark ? Colors.white : AppColors.textDark,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -263,19 +255,53 @@ class _LandingScreenState extends State<LandingScreen>
                     FadeTransition(
                       opacity: _taglineFade,
                       child: Text(
-                        'Bahasa Isyarat Indonesia.',
+                        'Deteksi gestur BISINDO\nsecara real-time',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: taglineSize.clamp(14.0, 18.0),
                           fontWeight: FontWeight.w400,
                           color: isDark ? Colors.white54 : Colors.grey[500],
                           letterSpacing: 0.5,
-                          height: 1.4,
+                          height: 1.5,
                         ),
                       ),
                     ),
 
-                    SizedBox(height: screenHeight * 0.08),
+                    SizedBox(height: screenHeight * 0.03),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: lightBlue.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: lightBlue.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: lightBlue.withValues(alpha: 0.25),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: screenHeight * 0.03),
 
                     // Tombol Get Started
                     AnimatedBuilder(
@@ -314,7 +340,7 @@ class _LandingScreenState extends State<LandingScreen>
                             backgroundColor: lightBlue,
                             foregroundColor: Colors.white,
                             elevation: 8,
-                            shadowColor: lightBlue.withOpacity(0.4),
+                            shadowColor: lightBlue.withValues(alpha: 0.4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(18),
                             ),
@@ -338,7 +364,23 @@ class _LandingScreenState extends State<LandingScreen>
                       ),
                     ),
 
-                    SizedBox(height: screenHeight * 0.06),
+                    SizedBox(height: screenHeight * 0.025),
+
+                    // Version badge
+                    FadeTransition(
+                      opacity: _buttonFade,
+                      child: Text(
+                        'v1.0.0 · BISINDO Detection',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? Colors.white24 : Colors.grey[400],
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: screenHeight * 0.04),
                   ],
                 ),
               ),
@@ -348,4 +390,5 @@ class _LandingScreenState extends State<LandingScreen>
       ),
     );
   }
+
 }

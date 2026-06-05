@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/app_colors.dart';
 import 'providers/theme_provider.dart';
 
 class AboutPage extends StatelessWidget {
@@ -8,23 +9,39 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
-    const Color primaryBlue = Color(0xFF4FC3F7);
-    const Color darkBlue = Color(0xFF0288D1);
+    const Color primaryBlue = AppColors.primary;
+    const Color darkBlue    = AppColors.primaryDark;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: Icon(Icons.arrow_back_ios,
+              color: isDark ? Colors.white70 : AppColors.primaryDark),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Tentang Aplikasi'),
+        title: Text(
+          'Tentang Aplikasi',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : AppColors.textDark,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppColors.bgDark1, AppColors.scaffoldDark]
+                : [AppColors.bgLight, Colors.white],
+          ),
+        ),
+        child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.symmetric(
           horizontal: screenWidth * 0.06,
@@ -45,7 +62,7 @@ class AboutPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: primaryBlue.withOpacity(0.3),
+                    color: primaryBlue.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -57,8 +74,8 @@ class AboutPage extends StatelessWidget {
                   height: (screenWidth * 0.17).clamp(56.0, 84.0),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF1B2838).withOpacity(0.9)
-                        : Colors.white.withOpacity(0.92),
+                        ? AppColors.bgDark2.withValues(alpha: 0.9)
+                        : Colors.white.withValues(alpha: 0.92),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Icon(
@@ -78,7 +95,7 @@ class AboutPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: (screenWidth * 0.065).clamp(24.0, 32.0),
                 fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                color: isDark ? Colors.white : AppColors.textDark,
                 letterSpacing: 1.0,
               ),
             ),
@@ -86,7 +103,7 @@ class AboutPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
               decoration: BoxDecoration(
-                color: primaryBlue.withOpacity(0.1),
+                color: primaryBlue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -118,7 +135,7 @@ class AboutPage extends StatelessWidget {
               icon: Icons.memory_rounded,
               title: 'Teknologi',
               content:
-                  'Flutter • MobileNetV2 • Temporal Shift Module • TensorFlow Lite',
+                  'Flutter • MobileNetV2 • Temporal Shift Module (TSM) • Flask API',
             ),
 
             const SizedBox(height: 14),
@@ -129,7 +146,7 @@ class AboutPage extends StatelessWidget {
               icon: Icons.star_rounded,
               title: 'Fitur Utama',
               content:
-                  '• Deteksi gestur real-time\n• Mendukung 10 kata isyarat\n• Kamera depan & belakang\n• Mode gelap & terang',
+                  '• Deteksi gestur real-time\n• Mendukung 24 gesture BISINDO\n• Kamera depan & belakang\n• Mode gelap & terang',
             ),
 
             const SizedBox(height: 28),
@@ -155,6 +172,7 @@ class AboutPage extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -168,12 +186,12 @@ class AboutPage extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[50],
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.06)
-              : Colors.grey.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.grey.withValues(alpha: 0.1),
         ),
       ),
       child: Column(
@@ -181,7 +199,7 @@ class AboutPage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: const Color(0xFF4FC3F7)),
+              Icon(icon, size: 18, color: AppColors.primary),
               const SizedBox(width: 8),
               Text(
                 title,

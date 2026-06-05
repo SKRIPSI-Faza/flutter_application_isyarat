@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'about_page.dart';
+import 'core/app_colors.dart';
 import 'providers/theme_provider.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -9,15 +11,25 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
-    const Color primaryBlue = Color(0xFF4FC3F7);
+    const Color primaryBlue = AppColors.primary;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pengaturan'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Pengaturan',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : AppColors.textDark,
+          ),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: Icon(Icons.arrow_back_ios,
+              color: isDark ? Colors.white70 : AppColors.primaryDark),
           onPressed: () => Navigator.pop(context),
         ),
+        centerTitle: true,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -41,17 +53,18 @@ class SettingsPage extends StatelessWidget {
               trailing: Switch(
                 value: isDark,
                 onChanged: (_) => themeProvider.toggleTheme(),
-                activeColor: primaryBlue,
+                activeThumbColor: primaryBlue,
               ),
             ),
             
             const SizedBox(height: 8),
             _buildSectionHeader('Deteksi Isyarat', isDark),
-            _buildSettingCard(
-              context,
+            _buildInfoTile(
               icon: Icons.speed,
               title: 'Mode Inferensi',
-              subtitle: 'Flask API Server (Cloud)',
+              subtitle: 'Flask API Server (Lokal)',
+              badge: 'Aktif',
+              isDark: isDark,
             ),
 
             const SizedBox(height: 8),
@@ -68,8 +81,11 @@ class SettingsPage extends StatelessWidget {
               icon: Icons.info_outline_rounded,
               title: 'Tentang Aplikasi',
               subtitle: 'Versi, developer & informasi app',
-              color: const Color(0xFF81C784),
-              onTap: () => _showAboutDialog(context),
+              color: AppColors.green,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutPage()),
+              ),
             ),
             const SizedBox(height: 24),
           ],
@@ -102,13 +118,20 @@ class SettingsPage extends StatelessWidget {
     VoidCallback? onTap,
     Color? color,
   }) {
-    final iconColor = color ?? const Color(0xFF4FC3F7);
+    final iconColor = color ?? AppColors.primary;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
-        leading: Icon(icon, color: iconColor),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: iconColor, size: 20),
+        ),
         title: Text(title,
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
@@ -127,8 +150,8 @@ class SettingsPage extends StatelessWidget {
         title: const Text('Kebijakan Privasi'),
         content: const Text(
           'Aplikasi ini menggunakan kamera untuk mendeteksi gestur bahasa isyarat secara real-time. '
-          'Semua proses inferensi berjalan sepenuhnya di perangkat Anda (on-device). '
-          'Tidak ada video, gambar, maupun data yang dikirim ke internet atau disimpan secara permanen.',
+          'Setiap frame dikirim ke server Flask API lokal (jaringan WiFi yang sama) untuk diproses. '
+          'Tidak ada data yang disimpan secara permanen di server maupun di perangkat Anda.',
         ),
         actions: [
           TextButton(
@@ -140,131 +163,44 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  void _showAboutDialog(BuildContext context) {
-    const Color primaryBlue = Color(0xFF4FC3F7);
-    const Color green = Color(0xFF81C784);
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        titlePadding: EdgeInsets.zero,
-        title: Container(
-          padding: const EdgeInsets.all(20),
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String badge,
+    required bool isDark,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [primaryBlue, Color(0xFF0288D1)],
-            ),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            color: AppColors.primary.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.back_hand_rounded,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'SnapSign',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'Versi 1.0.0',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
+          child: Icon(icon, color: AppColors.primary, size: 20),
+        ),
+        title: Text(title,
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppColors.green.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            badge,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.green,
+            ),
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              'Tentang Aplikasi',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Aplikasi deteksi gestur Bahasa Isyarat Indonesia (BISINDO) secara real-time menggunakan kamera dengan metode MobileNetV2 dan Temporal Shift Module (TSM).',
-              style: TextStyle(fontSize: 13, height: 1.6),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: green.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: green.withOpacity(0.2)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.school_rounded, size: 16, color: green),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Proyek Skripsi',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Dikembangkan sebagai proyek tugas akhir (skripsi) untuk membantu komunikasi bagi penyandang disabilitas tunarungu.',
-                    style: TextStyle(fontSize: 12, height: 1.5),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                const Icon(Icons.copyright_rounded, size: 14, color: Colors.grey),
-                const SizedBox(width: 6),
-                const Text(
-                  '2026 — All Rights Reserved',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Tutup'),
-          ),
-        ],
       ),
     );
   }

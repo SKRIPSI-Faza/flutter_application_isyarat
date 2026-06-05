@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/app_colors.dart';
+import 'models/sign_word.dart';
 import 'providers/theme_provider.dart';
-
-class SignWord {
-  final String word;
-  final String category;
-  final String gifPath;
-
-  const SignWord({
-    required this.word,
-    required this.category,
-    required this.gifPath,
-  });
-}
 
 class DictionaryPage extends StatefulWidget {
   const DictionaryPage({super.key});
@@ -24,53 +14,76 @@ class DictionaryPage extends StatefulWidget {
 class _DictionaryPageState extends State<DictionaryPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String _selectedCategory = 'Semua';
 
+  // Kategori sesuai 24 gesture yang didukung model (API)
+  final List<String> _categories = const [
+    'Semua',
+    'Kebutuhan',
+    'Aksi',
+    'Sapaan',
+    'Orang',
+    'Tanya',
+    'Tempat',
+    'Warna',
+    'Lainnya',
+  ];
+
+  // 24 kata = persis kelas gesture yang dikenali model klasifikasi.
   final List<SignWord> _allWords = const [
     SignWord(word: 'Air', category: 'Kebutuhan', gifPath: 'assets/gifs/air.gif'),
-    SignWord(word: 'Berangkat', category: 'Aksi', gifPath: 'assets/gifs/berangkat.gif'),
-    SignWord(word: 'Datang', category: 'Aksi', gifPath: 'assets/gifs/datang.gif'),
-    SignWord(word: 'Di Mana', category: 'Tanya', gifPath: 'assets/gifs/dimana.gif'),
-    SignWord(word: 'Keluarga', category: 'Orang', gifPath: 'assets/gifs/keluarga.gif'),
-    SignWord(word: 'Maaf', category: 'Sapaan', gifPath: 'assets/gifs/maaf.gif'),
     SignWord(word: 'Makan', category: 'Kebutuhan', gifPath: 'assets/gifs/makan.gif'),
-    SignWord(word: 'Rumah', category: 'Tempat', gifPath: 'assets/gifs/rumah.gif'),
-    SignWord(word: 'Teman', category: 'Orang', gifPath: 'assets/gifs/teman.gif'),
-    SignWord(word: 'Terima Kasih', category: 'Sapaan', gifPath: 'assets/gifs/terimakasih.gif'),
-    SignWord(word: 'Minum', category: 'Kebutuhan', gifPath: 'assets/gifs/minum.gif'),
-    SignWord(word: 'Ayah', category: 'Orang', gifPath: 'assets/gifs/ayah.gif'),
-    SignWord(word: 'Ibu', category: 'Orang', gifPath: 'assets/gifs/ibu.gif'),
-    SignWord(word: 'Kakak', category: 'Orang', gifPath: 'assets/gifs/kakak.gif'),
-    SignWord(word: 'Adik', category: 'Orang', gifPath: 'assets/gifs/adik.gif'),
-    SignWord(word: 'Siapa', category: 'Tanya', gifPath: 'assets/gifs/siapa.gif'),
-    SignWord(word: 'Apa', category: 'Tanya', gifPath: 'assets/gifs/apa.gif'),
-    SignWord(word: 'Kapan', category: 'Tanya', gifPath: 'assets/gifs/kapan.gif'),
-    SignWord(word: 'Bagaimana', category: 'Tanya', gifPath: 'assets/gifs/bagaimana.gif'),
-    SignWord(word: 'Kenapa', category: 'Tanya', gifPath: 'assets/gifs/kenapa.gif'),
-    SignWord(word: 'Tolong', category: 'Sapaan', gifPath: 'assets/gifs/tolong.gif'),
-    SignWord(word: 'Sama-sama', category: 'Sapaan', gifPath: 'assets/gifs/samasama.gif'),
-    SignWord(word: 'Halo', category: 'Sapaan', gifPath: 'assets/gifs/halo.gif'),
-    SignWord(word: 'Selamat Pagi', category: 'Sapaan', gifPath: 'assets/gifs/selamatpagi.gif'),
-    SignWord(word: 'Selamat Malam', category: 'Sapaan', gifPath: 'assets/gifs/selamatmalam.gif'),
-    SignWord(word: 'Jalan', category: 'Aksi', gifPath: 'assets/gifs/jalan.gif'),
-    SignWord(word: 'Lari', category: 'Aksi', gifPath: 'assets/gifs/lari.gif'),
-    SignWord(word: 'Tidur', category: 'Kebutuhan', gifPath: 'assets/gifs/tidur.gif'),
     SignWord(word: 'Belajar', category: 'Aksi', gifPath: 'assets/gifs/belajar.gif'),
-    SignWord(word: 'Sekolah', category: 'Tempat', gifPath: 'assets/gifs/sekolah.gif'),
-    SignWord(word: 'Pasar', category: 'Tempat', gifPath: 'assets/gifs/pasar.gif'),
-    SignWord(word: 'Kantor', category: 'Tempat', gifPath: 'assets/gifs/kantor.gif'),
+    SignWord(word: 'Berangkat', category: 'Aksi', gifPath: 'assets/gifs/berangkat.gif'),
+    SignWord(word: 'Cari', category: 'Aksi', gifPath: 'assets/gifs/cari.gif'),
+    SignWord(word: 'Datang', category: 'Aksi', gifPath: 'assets/gifs/datang.gif'),
+    SignWord(word: 'Dengar', category: 'Aksi', gifPath: 'assets/gifs/dengar.gif'),
+    SignWord(word: 'Maaf', category: 'Sapaan', gifPath: 'assets/gifs/maaf.gif'),
+    SignWord(word: 'Terima Kasih', category: 'Sapaan', gifPath: 'assets/gifs/terimakasih.gif'),
+    SignWord(word: 'Keluarga', category: 'Orang', gifPath: 'assets/gifs/keluarga.gif'),
     SignWord(word: 'Saya', category: 'Orang', gifPath: 'assets/gifs/saya.gif'),
-    SignWord(word: 'Kamu', category: 'Orang', gifPath: 'assets/gifs/kamu.gif'),
-    SignWord(word: 'Dia', category: 'Orang', gifPath: 'assets/gifs/dia.gif'),
-    SignWord(word: 'Mereka', category: 'Orang', gifPath: 'assets/gifs/mereka.gif'),
+    SignWord(word: 'Teman', category: 'Orang', gifPath: 'assets/gifs/teman.gif'),
+    SignWord(word: 'Bagaimana', category: 'Tanya', gifPath: 'assets/gifs/bagaimana.gif'),
+    SignWord(word: 'Di Mana', category: 'Tanya', gifPath: 'assets/gifs/dimana.gif'),
+    SignWord(word: 'Kapan', category: 'Tanya', gifPath: 'assets/gifs/kapan.gif'),
+    SignWord(word: 'Mengapa', category: 'Tanya', gifPath: 'assets/gifs/mengapa.gif'),
+    SignWord(word: 'Siapa', category: 'Tanya', gifPath: 'assets/gifs/siapa.gif'),
+    SignWord(word: 'Rumah', category: 'Tempat', gifPath: 'assets/gifs/rumah.gif'),
+    SignWord(word: 'Hijau', category: 'Warna', gifPath: 'assets/gifs/hijau.gif'),
+    SignWord(word: 'Kuning', category: 'Warna', gifPath: 'assets/gifs/kuning.gif'),
+    SignWord(word: 'Merah', category: 'Warna', gifPath: 'assets/gifs/merah.gif'),
+    SignWord(word: 'Lagi', category: 'Lainnya', gifPath: 'assets/gifs/lagi.gif'),
+    SignWord(word: 'Motor', category: 'Lainnya', gifPath: 'assets/gifs/motor.gif'),
+    SignWord(word: 'Tuli', category: 'Lainnya', gifPath: 'assets/gifs/tuli.gif'),
   ];
 
   List<SignWord> get _filteredWords {
-    if (_searchQuery.isEmpty) return _allWords;
-    return _allWords
-        .where((word) =>
-            word.word.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            word.category.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
+    var words = _allWords;
+    if (_selectedCategory != 'Semua') {
+      words = words.where((w) => w.category == _selectedCategory).toList();
+    }
+    if (_searchQuery.isNotEmpty) {
+      words = words
+          .where((w) =>
+              w.word.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              w.category.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
+    return words;
+  }
+
+  Color _categoryColor(String category) {
+    switch (category) {
+      case 'Kebutuhan': return AppColors.primary;
+      case 'Aksi':      return AppColors.green;
+      case 'Sapaan':    return AppColors.yellow;
+      case 'Orang':     return AppColors.orange;
+      case 'Tanya':     return AppColors.purple;
+      case 'Tempat':    return AppColors.teal;
+      case 'Warna':     return AppColors.pink;
+      case 'Lainnya':   return AppColors.blueGrey;
+      default:          return AppColors.primary;
+    }
   }
 
   @override
@@ -82,22 +95,38 @@ class _DictionaryPageState extends State<DictionaryPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
-    const Color primaryBlue = Color(0xFF4FC3F7);
+    const Color primaryBlue = AppColors.primary;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: Icon(Icons.arrow_back_ios,
+              color: isDark ? Colors.white70 : AppColors.primaryDark),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Kamus Isyarat'),
+        title: Text(
+          'Kamus Isyarat',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: isDark ? Colors.white : AppColors.textDark,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: Column(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppColors.bgDark1, AppColors.scaffoldDark]
+                : [AppColors.bgLight, Colors.white],
+          ),
+        ),
+        child: Column(
         children: [
           // Search bar
           Padding(
@@ -137,6 +166,48 @@ class _DictionaryPageState extends State<DictionaryPage> {
             ),
           ),
 
+          // Category filter chips
+          SizedBox(
+            height: 44,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final cat = _categories[index];
+                final isSelected = _selectedCategory == cat;
+                final catColor =
+                    cat == 'Semua' ? primaryBlue : _categoryColor(cat);
+                return ChoiceChip(
+                  label: Text(cat),
+                  selected: isSelected,
+                  onSelected: (_) =>
+                      setState(() => _selectedCategory = cat),
+                  selectedColor: catColor,
+                  backgroundColor:
+                      isDark ? Colors.grey[800] : Colors.grey[100],
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? Colors.white70 : Colors.black87),
+                    fontSize: 12,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                  side: BorderSide(
+                    color: isSelected
+                        ? catColor
+                        : Colors.transparent,
+                  ),
+                  visualDensity: VisualDensity.compact,
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
           // Info jumlah hasil
           Padding(
             padding: EdgeInsets.symmetric(
@@ -156,8 +227,6 @@ class _DictionaryPageState extends State<DictionaryPage> {
             ),
           ),
 
-          const SizedBox(height: 4),
-
           // Grid
           Expanded(
             child: _filteredWords.isEmpty
@@ -175,7 +244,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           'Kata tidak ditemukan',
                           style: TextStyle(
                             fontSize: 15,
-                            color: isDark ? Colors.white38 : Colors.grey[500],
+                            color:
+                                isDark ? Colors.white38 : Colors.grey[500],
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -183,7 +253,8 @@ class _DictionaryPageState extends State<DictionaryPage> {
                           'Coba kata lain',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? Colors.white24 : Colors.grey[400],
+                            color:
+                                isDark ? Colors.white24 : Colors.grey[400],
                           ),
                         ),
                       ],
@@ -203,6 +274,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
                     itemCount: _filteredWords.length,
                     itemBuilder: (context, index) {
                       final word = _filteredWords[index];
+                      final catColor = _categoryColor(word.category);
                       return GestureDetector(
                         onTap: () {
                           _showGifDialog(context, word);
@@ -213,13 +285,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color:
+                                    Colors.black.withValues(alpha: 0.05),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                             border: Border.all(
-                              color: primaryBlue.withOpacity(0.1),
+                              color: catColor.withValues(alpha: 0.15),
                             ),
                           ),
                           child: Column(
@@ -228,12 +301,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: primaryBlue.withOpacity(0.1),
+                                  color: catColor.withValues(alpha: 0.12),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.play_circle_fill,
-                                  color: primaryBlue,
+                                  color: catColor,
                                   size: 24,
                                 ),
                               ),
@@ -241,9 +314,12 @@ class _DictionaryPageState extends State<DictionaryPage> {
                               Text(
                                 word.word,
                                 style: TextStyle(
-                                  fontSize: (screenWidth * 0.038).clamp(14.0, 17.0),
+                                  fontSize: (screenWidth * 0.038)
+                                      .clamp(14.0, 17.0),
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black87,
+                                  color: isDark
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -253,14 +329,17 @@ class _DictionaryPageState extends State<DictionaryPage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: primaryBlue.withOpacity(0.08),
+                                  color: catColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   word.category,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: isDark ? Colors.white38 : primaryBlue,
+                                    color: isDark
+                                        ? catColor.withValues(alpha: 0.8)
+                                        : catColor,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
@@ -273,32 +352,57 @@ class _DictionaryPageState extends State<DictionaryPage> {
           ),
         ],
       ),
+      ),
     );
   }
 
   void _showGifDialog(BuildContext context, SignWord word) {
-    final isDark = Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
-    
+    final isDark =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+    final catColor = _categoryColor(word.category);
+
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
           backgroundColor: isDark ? Colors.grey[900] : Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  word.word,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      word.word,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: catColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        word.category,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: catColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 ClipRRect(
@@ -312,20 +416,26 @@ class _DictionaryPageState extends State<DictionaryPage> {
                       return Container(
                         height: 200,
                         width: 200,
-                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[800] : Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.broken_image,
-                              size: 50,
-                              color: isDark ? Colors.grey[600] : Colors.grey[400],
+                              Icons.sign_language_rounded,
+                              size: 56,
+                              color: catColor.withValues(alpha: 0.4),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'GIF belum tersedia',
                               style: TextStyle(
-                                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[600],
+                                fontSize: 13,
                               ),
                             ),
                           ],
@@ -335,15 +445,19 @@ class _DictionaryPageState extends State<DictionaryPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4FC3F7),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: catColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    child: const Text('Tutup',
+                        style: TextStyle(color: Colors.white)),
                   ),
-                  child: const Text('Tutup', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
