@@ -8,4 +8,10 @@ class SignWord {
     required this.category,
     required this.gifPath,
   });
+
+  factory SignWord.auto(String word, String category) => SignWord(
+        word: word,
+        category: category,
+        gifPath: 'assets/gifs/${word.toLowerCase().replaceAll(' ', '')}.gif',
+      );
 }

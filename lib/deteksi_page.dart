@@ -36,6 +36,8 @@ class _DeteksiPageState extends State<DeteksiPage> {
       body: Column(
         children: [
           _buildResultPanel(provider, isDark),
+          if (provider.isPermissionDenied)
+            _buildPermissionBanner(provider),
           Expanded(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -122,29 +124,11 @@ class _DeteksiPageState extends State<DeteksiPage> {
 
   Widget _buildCameraView(DetectionProvider provider) {
     if (provider.isCameraInitialized && provider.cameraController != null) {
-      final controller = provider.cameraController!;
-      // CameraPreview sudah menangani aspect-ratio & rotasi sendiri.
-      // Cukup di-tengah-kan (Center) — JANGAN dipaksa isi penuh / ukuran tetap,
-      // karena itu yang bikin preview gepeng / "ketarik ke atas".
-      return Center(child: CameraPreview(controller));
+      return Center(child: CameraPreview(provider.cameraController!));
     }
     if (provider.isPermissionDenied) {
-      final permanent = provider.isPermissionPermanentlyDenied;
-      return _buildStatusView(
-        icon: Icons.no_photography_rounded,
-        iconColor: Colors.red,
-        title: 'Izin Kamera Ditolak',
-        subtitle: permanent
-            ? 'Izin kamera diblokir. Buka Pengaturan untuk mengizinkan akses kamera, lalu kembali ke halaman ini.'
-            : 'Aplikasi perlu akses kamera untuk mendeteksi gestur. Izinkan kamera untuk melanjutkan.',
-        actionLabel: permanent ? 'Buka Pengaturan' : 'Coba Lagi',
-        onAction: permanent
-            ? () => provider.openSettings()
-            : () {
-                provider.clearCameraError();
-                provider.initCamera();
-              },
-      );
+      // Banner di luar sudah menangani notifikasi izin — area kamera cukup abu-abu.
+      return Container(color: Colors.grey[900]);
     }
     if (provider.cameraError != null) {
       return _buildStatusView(
@@ -160,6 +144,48 @@ class _DeteksiPageState extends State<DeteksiPage> {
       );
     }
     return _buildLoadingView();
+  }
+
+  Widget _buildPermissionBanner(DetectionProvider provider) {
+    final permanent = provider.isPermissionPermanentlyDenied;
+    final isDark    = context.read<ThemeProvider>().isDarkMode;
+    return GestureDetector(
+      onTap: permanent
+          ? () => provider.openSettings()
+          : () => provider.requestCameraPermission(),
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.orange.withValues(alpha: isDark ? 0.15 : 0.10),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.orange.withValues(alpha: 0.35),
+          ),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.camera_alt_outlined,
+                size: 18, color: Colors.orange),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                permanent
+                    ? 'Izin kamera diblokir. Tap untuk buka Pengaturan.'
+                    : 'Berikan izin kamera untuk mulai deteksi.',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.orange,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded,
+                size: 18, color: Colors.orange),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildFeedbackBorder(DetectionProvider provider) {

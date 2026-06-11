@@ -30,32 +30,26 @@ class _DictionaryPageState extends State<DictionaryPage> {
   ];
 
   // 24 kata = persis kelas gesture yang dikenali model klasifikasi.
-  final List<SignWord> _allWords = const [
-    SignWord(word: 'Air', category: 'Kebutuhan', gifPath: 'assets/gifs/air.gif'),
-    SignWord(word: 'Makan', category: 'Kebutuhan', gifPath: 'assets/gifs/makan.gif'),
-    SignWord(word: 'Belajar', category: 'Aksi', gifPath: 'assets/gifs/belajar.gif'),
-    SignWord(word: 'Berangkat', category: 'Aksi', gifPath: 'assets/gifs/berangkat.gif'),
-    SignWord(word: 'Cari', category: 'Aksi', gifPath: 'assets/gifs/cari.gif'),
-    SignWord(word: 'Datang', category: 'Aksi', gifPath: 'assets/gifs/datang.gif'),
-    SignWord(word: 'Dengar', category: 'Aksi', gifPath: 'assets/gifs/dengar.gif'),
-    SignWord(word: 'Maaf', category: 'Sapaan', gifPath: 'assets/gifs/maaf.gif'),
-    SignWord(word: 'Terima Kasih', category: 'Sapaan', gifPath: 'assets/gifs/terimakasih.gif'),
-    SignWord(word: 'Keluarga', category: 'Orang', gifPath: 'assets/gifs/keluarga.gif'),
-    SignWord(word: 'Saya', category: 'Orang', gifPath: 'assets/gifs/saya.gif'),
-    SignWord(word: 'Teman', category: 'Orang', gifPath: 'assets/gifs/teman.gif'),
-    SignWord(word: 'Bagaimana', category: 'Tanya', gifPath: 'assets/gifs/bagaimana.gif'),
-    SignWord(word: 'Di Mana', category: 'Tanya', gifPath: 'assets/gifs/dimana.gif'),
-    SignWord(word: 'Kapan', category: 'Tanya', gifPath: 'assets/gifs/kapan.gif'),
-    SignWord(word: 'Mengapa', category: 'Tanya', gifPath: 'assets/gifs/mengapa.gif'),
-    SignWord(word: 'Siapa', category: 'Tanya', gifPath: 'assets/gifs/siapa.gif'),
-    SignWord(word: 'Rumah', category: 'Tempat', gifPath: 'assets/gifs/rumah.gif'),
-    SignWord(word: 'Hijau', category: 'Warna', gifPath: 'assets/gifs/hijau.gif'),
-    SignWord(word: 'Kuning', category: 'Warna', gifPath: 'assets/gifs/kuning.gif'),
-    SignWord(word: 'Merah', category: 'Warna', gifPath: 'assets/gifs/merah.gif'),
-    SignWord(word: 'Lagi', category: 'Lainnya', gifPath: 'assets/gifs/lagi.gif'),
-    SignWord(word: 'Motor', category: 'Lainnya', gifPath: 'assets/gifs/motor.gif'),
-    SignWord(word: 'Tuli', category: 'Lainnya', gifPath: 'assets/gifs/tuli.gif'),
-  ];
+  // gifPath di-derive otomatis: 'assets/gifs/${kata.lowercase}.gif'
+  static final List<SignWord> _allWords = _buildWords();
+
+  static List<SignWord> _buildWords() {
+    const data = {
+      'Kebutuhan': ['Air', 'Makan'],
+      'Aksi':      ['Belajar', 'Berangkat', 'Cari', 'Datang', 'Dengar'],
+      'Sapaan':    ['Maaf', 'Terima Kasih'],
+      'Orang':     ['Keluarga', 'Saya', 'Teman'],
+      'Tanya':     ['Bagaimana', 'Di Mana', 'Kapan', 'Mengapa', 'Siapa'],
+      'Tempat':    ['Rumah'],
+      'Warna':     ['Hijau', 'Kuning', 'Merah'],
+      'Lainnya':   ['Lagi', 'Motor', 'Tuli'],
+    };
+    return [
+      for (final entry in data.entries)
+        for (final word in entry.value)
+          SignWord.auto(word, entry.key),
+    ];
+  }
 
   List<SignWord> get _filteredWords {
     var words = _allWords;

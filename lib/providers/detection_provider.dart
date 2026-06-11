@@ -99,12 +99,13 @@ class DetectionProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   // ── Kamera ───────────────────────────────────────────────────
+
+  // Cek status izin saja (tidak memunculkan dialog sistem).
+  // Jika belum diberikan, UI menampilkan banner notifikasi; user yang tap
+  // untuk memicu requestCameraPermission() secara eksplisit.
   Future<void> initCamera() async {
     try {
-      // Minta izin kamera secara eksplisit → memunculkan dialog sistem.
-      // Kalau ditolak permanen, OS tak akan menampilkan dialog lagi,
-      // jadi kita tandai agar UI bisa mengarahkan ke Pengaturan.
-      final status = await Permission.camera.request();
+      final status = await Permission.camera.status;
       if (!status.isGranted) {
         _isPermissionDenied    = true;
         _isPermissionPermanent =
@@ -202,6 +203,23 @@ class DetectionProvider extends ChangeNotifier with WidgetsBindingObserver {
     _isPermissionPermanent = false;
     _cameraError           = null;
     notifyListeners();
+  }
+
+  // Dipanggil saat user tap banner izin — baru di sini dialog sistem muncul.
+  Future<void> requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    if (!status.isGranted) {
+      _isPermissionDenied    = true;
+      _isPermissionPermanent = status.isPermanentlyDenied || status.isRestricted;
+      _isCameraInitialized   = false;
+      _isSwitchingCamera     = false;
+      notifyListeners();
+      return;
+    }
+    _isPermissionDenied    = false;
+    _isPermissionPermanent = false;
+    notifyListeners();
+    await initCamera();
   }
 
   // Buka halaman pengaturan izin aplikasi (saat izin ditolak permanen).
