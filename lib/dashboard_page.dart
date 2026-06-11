@@ -176,7 +176,7 @@ class _DashboardPageState extends State<DashboardPage>
               },
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(13),
                 decoration: BoxDecoration(
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.06)
@@ -209,27 +209,30 @@ class _DashboardPageState extends State<DashboardPage>
         setState(() => _checkingApi = true);
         _checkApiStatus();
       },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: _apiOnline ? Colors.green : Colors.red,
-              shape: BoxShape.circle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: _apiOnline ? Colors.green : Colors.red,
+                shape: BoxShape.circle,
+              ),
             ),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            _apiOnline ? 'API Online' : 'API Offline',
-            style: TextStyle(
-              fontSize: 11,
-              color: _apiOnline ? Colors.green : Colors.red,
-              fontWeight: FontWeight.w600,
+            const SizedBox(width: 5),
+            Text(
+              _apiOnline ? 'API Online' : 'API Offline',
+              style: TextStyle(
+                fontSize: 11,
+                color: _apiOnline ? Colors.green : Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

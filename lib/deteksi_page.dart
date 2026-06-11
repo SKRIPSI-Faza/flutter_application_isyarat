@@ -184,7 +184,7 @@ class _DeteksiPageState extends State<DeteksiPage> {
       child: GestureDetector(
         onTap: provider.switchCamera,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
